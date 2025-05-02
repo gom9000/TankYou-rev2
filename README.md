@@ -1,6 +1,6 @@
 # TankYou rev2
 A simple 4-lines power supply (9 volt) bank connected to the mains. 
-This is an simple project for a 4-lines power supply bank capable of powering small household devices.
+This is a simple project for a 4-lines power supply bank capable of powering small household devices.
 
 ![overview](tank-you-r2.jpg)
 ![left](tank-you-r2-left.jpg)
