@@ -40,7 +40,7 @@ $V_{DC} = V_{AC} \times \sqrt{2} - 2 \times V_D$
 
 Assuming $V_D=0.7V$ and a measured secondary voltage of $13 VAC$:
 
-$V_{DC}​​ = 13 \times \sqrt{2}​ - 1.4 \approx 16.9V$
+$V_{DC} = 13 \times \sqrt{2} - 1.4 \approx 16.9V$
 
 **Filtering:**<br/>
 Each rectified rail is filtered by bulk electrolytic capacitors ($C = 4700\mu F$).<br/>
