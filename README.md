@@ -20,8 +20,6 @@ A simple 4-line linear power supply bank (9V DC) connected to the mains.
 - Heavy-duty PVC enclosure (from an electrical junction box)
 - An old-fashioned external look
 
-![package-inside](resources/tank-you-r2-inside.jpg)
-
 
 ## Design
 The design intentionally prioritizes simplicity, availability of common components, and practical reliability over maximum electrical performance... Moreover the exposed aesthetic identity of the encapsulated transformer and the 4 giant and so beautiful caps.
@@ -86,6 +84,7 @@ The circuit was designed with ExpressPCB.
 > [!NOTE]
 > The circuit is housed in a standard PVC electrical junction box. Because the enclosure is fully made of insulating plastic material, a chassis earth connection is not strictly required for external user safety. However, inside the box, all AC mains paths are kept physically separated from the low-voltage DC sections.
 
+![package-inside](resources/tank-you-r2-inside.jpg)
 ![board-pcb-top](resources/tank-you-r2_pcb-top.jpg)
 ![board-pcb-bottom](resources/tank-you-r2_pcb-bottom.jpg)
 
