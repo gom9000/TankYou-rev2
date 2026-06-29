@@ -13,17 +13,18 @@ A simple 4-line linear power supply bank (9V DC) connected to the mains.
 
 
 ## Specifications
-- power source from mains
+- Power source from mains
 - 2 galvanically isolated ground domains
 - 4 Regulated 9V DC Lines (2 per isolated ground)
 - 200mA max per line (Center-Negative polarity)
-- an old-fashion external look
+- Heavy-duty PVC enclosure (from an electrical junction box)
+- An old-fashioned external look
 
 ![package-inside](resources/tank-you-r2-inside.jpg)
 
 
 ## Design
-The design intentionally prioritizes simplicity, availability of common components, and practical reliability over maximum electrical performance... Moreover the use of that transformer and the 4 giant and so beautiful caps.
+The design intentionally prioritizes simplicity, availability of common components, and practical reliability over maximum electrical performance... Moreover the exposed aesthetic identity of the encapsulated transformer and the 4 giant and so beautiful caps.
 
 ### Schematic
 ![board-schematic](resources/tank-you-r2_sch.jpg)
@@ -32,14 +33,16 @@ The design intentionally prioritizes simplicity, availability of common componen
 The circuit is organized in three stages: transformer and rectification, filtering, and voltage regulation.
 
 **Transformer and rectification:**<br/>
+*Notes: The transformer is rated at 9 VAC nominal, but the unloaded secondary voltage measures approximately 13 VAC, which is typical for small EI transformers.*
+
 The mains transformer provides two independent secondary windings to achieve galvanic isolation between the two ground domains.
 Each winding is rectified independently by bridge rectifiers, producing the following $DC$ voltage before filtering:
 
 $V_{DC} = V_{AC} \times \sqrt{2} - 2 \times V_D$
 
-Assuming $V_D=0.7V$:
+Assuming $V_D=0.7V$ and a measured secondary voltage of $13 VAC$:
 
-$V_{DC}​​ = 9 \times \sqrt{2}​ - 1.4 \approx 11.33V$
+$V_{DC}​​ = 13 \times \sqrt{2}​ - 1.4 \approx 16.9V$
 
 **Filtering:**<br/>
 Each rectified rail is filtered by bulk electrolytic capacitors ($C = 4700\mu F$).<br/>
@@ -52,42 +55,36 @@ At maximum combined load for each isolated domain ($I_{load} = 400mA$ total per 
 $V_{ripple} = \frac{0.4}{2 \times 50 \times 4700 \times 10^{-6}} \approx 0.85V_{pp}$
 
 **Voltage Regulation:**<br/>
-Four standard $7809$ linear regulators produce the four regulated $9V$ output rails. 
-The input headroom available to each regulator under maximum load is:
+Four standard $7809$ linear regulators produce the four regulated $9V$ output rails. Under an actual full rated load of $200mA$ per line, the transformer exhibits a typical voltage regulation drop, settling the regulator input voltage ($V_{IN}$) at $\approx 13.3V \div 13.5V$ (as documented in the Test Log). This dynamic adjustment yields a real static headroom of:
 
-$V_{headroom} = V_{DC} - V_{ripple} - V_{out} = 11.33 - 0.85 - 9.0 = 1.48V$
+$V_{headroom} = V_{IN} - V_{out} = 13.3V - 9.1V \approx 4.2V$
 
-However, empirical measurements show that the transformer secondary delivers a high no-load voltage of $\approx 13VAC$, which translates to:
-$V_{DC_{no\_load}}​​ = 13 \times \sqrt{2}​ - 1.4 \approx 16.9V$
-
-Under an actual full rated load of $200mA$ per line, the transformer exhibits a typical voltage regulation drop, settling the regulator input voltage ($V_{IN}$) at $\approx 13.3V \div 13.5V$ (as documented in the Test Log). This dynamic adjustment yields a real static headroom of:
-$V_{headroom\_real} = 13.3V - 9.1V = 4.2V$
-Subtracting the calculated dynamic ripple ($0.85V_{pp}$), the minimum instantaneous input voltage remains at $\approx 12.45V$, which is safely above the $7809$ internal dropout threshold ($\approx 2.0V$), ensuring clean and stable regulation.
+which is safely above the $7809$ internal dropout voltage ($\approx 2.0V$) and the calculated ripple, ensuring stable regulation.
 
 
 **Power dissipation:**<br/>
-The thermal dissipation on each regulator decreases as the load increases due to the transformer's internal voltage drop. 
 Using the real-world measured $V_{IN} \approx 13.3V$ under the maximum nominal current ($200mA$):
 
 $P_{U_{MAX}} = (V_{IN} - V_{out}) \times I_{MAX} = (13.3 - 9.1) \times 0.2 = 0.84W$
 
-All four regulators are mounted on a shared aluminum heatsink with an estimated worst-case thermal resistance $\Theta_{hs} \approx 7 \, K/W$. 
-Assuming a high ambient temperature ($T_{amb} = 30^\circ C$), the expected stabilized temperature of the external heatsink is:
+The $78xx$ regulators in TO-220 package have a thermal resistance $\Theta_{jc} = 5 K/W$. All four regulators are mounted on a shared aluminum heatsink with an estimated thermal resistance ($\Theta_{hs}$) between $5K/W$ and $7K/W$. With $T_A = 30^\circ C$ and $\Theta_{cs} \approx 1$:
 
-$T_{hs} = T_{amb} + (\Theta_{hs} \times (P_{U_{MAX}} \times 4)) = 30 + (7 \times 3.36) \approx 53.5^\circ C$
+$T_{hs} = T_A + 4 \times P_{U_{MAX}} \times \Theta_{hs} = 30 + 3.36 \times 7 \approx 55^\circ C$<br/>
+$T_j = T_{hs} + P_{U_{MAX}} \times (\Theta_{jc} + \Theta_{cs}) \approx 55 + 5 \approx 60^\circ C$
 
-Accounting for the standard TO-220 junction-to-case thermal resistance ($\Theta_{jc} \approx 5 \, K/W$), the internal silicon junction temperature ($T_j$) of the hottest regulator under worst-case continuous full load is estimated as:
-
-$T_j = T_{hs} + (\Theta_{jc} \times P_{U_{MAX}}) = 53.5 + (5 \times 0.84) \approx 60^\circ C$
+Junction temperature remains well within the absolute maximum rating ($125^\circ C$).
 
 **Protection:**<br/>
-Each regulator is protected by an antiparallel diode connected between OUT and IN. This safe-guards the regulation stage against reverse currents from inductive or capacitive loads during power-down cycles.
+Each regulator is protected by an antiparallel diode connected between OUT and IN. This safeguards the regulation stage against reverse currents from inductive or capacitive loads during power-down cycles.
 
 
 ## Implementation and Test
 
 ### PCB Layout
 The circuit was designed with ExpressPCB.
+
+> [!NOTE]
+> The circuit is housed in a standard PVC electrical junction box. Because the enclosure is fully made of insulating plastic material, a chassis earth connection is not strictly required for external user safety. However, inside the box, all AC mains paths are kept physically separated from the low-voltage DC sections.
 
 ![board-pcb-top](resources/tank-you-r2_pcb-top.jpg)
 ![board-pcb-bottom](resources/tank-you-r2_pcb-bottom.jpg)
@@ -138,7 +135,7 @@ No calibration required. Output voltages are determined by the fixed internal re
 |500|9.0|10.9|
 
 #### Thermal Dissipation Test
-The test was conducted by drawing a continuous load of $200mA$ simultaneously on 2 lines (one per isolated dominio: line 1 and line 4) for a duration of 60 minutes, at a stable ambient temperature ($T_{amb} = 30^\circ C$):
+Due to test bench limitations (availability of two dummy loads: one [resistive dummy load](https://github.com/gom9000/xp-dummyload/tree/master/dummyload-resistor-9) and one [MOSFET active dummy load](https://github.com/gom9000/xp-dummyload/tree/master/dummyload-mosfet)), the test was conducted by drawing a continuous maximum load of $200mA$ simultaneously on 2 lines (one per isolated domain: Line 1 and Line 4) for a duration of 60 minutes, at a stable ambient temperature ($T_{amb} = 30^\circ C$):
 
 | Elapsed (minutes) | $T_{hs} (^\circ C)$ |
 |:---:|:---|
@@ -152,10 +149,18 @@ The test was conducted by drawing a continuous load of $200mA$ simultaneously on
 - **Domain 2, Line 4**: $V_{IN} \approx 13.5V$, dropping $13.5V - 9.1V = 4.4V$ across regulator U4. Power dissipation: $P = 4.4V \times 0.2A = 0.88W$.
 
 Total power dissipation delivered to the shared heatsink:
+
 $P_{tot} = 0.84 + 0.88 = 1.72W$
 
-Using the thermal Ohm's law, the actual thermal resistance of the external heatsink ($\Theta_{hs}$) is derived as:
-$$\Theta_{hs} = \frac{\Delta T}{P_{tot}} = \frac{T_{hs} - T_{amb}}{1.72} \approx  6K/W$$
+Using the thermal Ohm's law, the actual thermal resistance of the external heatsink ($\Theta_{hs}$) is experimentally derived as:
+
+$\Theta_{hs} = \frac{\Delta T}{P_{tot}} = \frac{T_{hs} - T_{amb}}{P_{tot}} = \frac{40^\circ C - 30^\circ C}{1.72W} \approx 5.8 \, K/W$
+
+
+#### Output Noise and Ripple Test
+The output AC ripple and noise were monitored under a full $200mA$ resistive load using an FNIRSI 1014D digital oscilloscope (AC coupling). The output waveform shows no periodic $100 \, Hz$ ripple component above the instrument's noise floor (~50mV/div minimum scale).
+
+Testing the supply output connected in series with a $1\mu F$ polyester capacitor directly into a high-gain guitar amplifier at maximum volume, reveals only broadband thermal noise with no tonal AC components, confirms the absence of audible hum or buzz.
 
 
 ## Conclusions
